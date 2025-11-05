@@ -41,6 +41,7 @@ dependencies = [
     "torch>=2.2.0,<2.9.0",
     "torchvision",
     "transformers>=4.53.1,<4.58.0",
+    "mteb>=1.16.3,<2",
 ]
 
 [project.optional-dependencies]
