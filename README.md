@@ -10,6 +10,8 @@ source .venv/bin/activate
 # Install mteb from submodule (editable mode)
 uv pip install -e ./mteb
 
+uv pip install -e ./LEANN
+
 # Install colpali-engine
 uv pip install .
 ```

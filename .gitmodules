@@ -1,3 +1,6 @@
 [submodule "mteb"]
 	path = mteb
 	url = https://github.com/yichuan-w/mteb
+[submodule "LEANN"]
+	path = LEANN
+	url = https://github.com/yichuan-w/LEANN
