@@ -20,3 +20,24 @@ uv pip install .
 ```
 mteb run -b "ViDoRe(v2)" -m "vidore/colqwen2.5-v0.2"
 ```
+## for train 
+
+```
+uv pip install flash-attn --no-build-isolation
+
+USE_LOCAL_DATASET=0 python scripts/configs/qwen2/train_colqwen25_model.py \
+    --output-dir ./models/my_colqwen25_lora \
+    --peft \
+    --batch-size 8 \
+    --eval-batch-size 4 \
+    --gradient-accumulation-steps 8
+```
+
+if we use multi GPU
+```
+USE_LOCAL_DATASET=0 accelerate launch --multi-gpu scripts/configs/qwen2/train_colqwen25_model.py \
+    --output-dir ./models/my_colqwen25_lora \
+    --peft \
+    --batch-size 8 \
+    --gradient-accumulation-steps 8
+```

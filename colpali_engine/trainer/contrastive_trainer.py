@@ -52,6 +52,13 @@ class ContrastiveTrainer(Trainer):
         self.train_dataset_list = train_dataset_list
         self.eval_dataset_list = eval_dataset_list
         self.compute_symetric_loss = compute_symetric_loss
+        
+        # Initialize prefix attributes from data_collator if available
+        # This ensures they are set even when using default dataloader
+        if hasattr(self.data_collator, 'query_prefix'):
+            self.query_prefix = self.data_collator.query_prefix
+            self.pos_prefix = self.data_collator.pos_doc_prefix
+            self.neg_prefix = self.data_collator.neg_doc_prefix
 
     def get_train_dataloader(self) -> DataLoader:
         """
@@ -116,9 +123,20 @@ class ContrastiveTrainer(Trainer):
 
         return self.accelerator.prepare(dataloader)
 
-    def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
+    def _get_train_sampler(self, dataset=None) -> Optional[torch.utils.data.Sampler]:
+        """
+        Get the training sampler.
+        
+        Args:
+            dataset: Optional dataset parameter (required by newer transformers versions).
+                    Ignored when train_dataset_list is not None.
+        """
         if self.train_dataset_list is None:
-            return super()._get_train_sampler()
+            # For newer transformers versions, pass dataset parameter if provided
+            if dataset is not None:
+                return super()._get_train_sampler(dataset)
+            else:
+                return super()._get_train_sampler()
 
         # Use SingleDatasetBatchSampler to ensure that each dataset in the list is sampled independently
         # Note: Surely breaks in distributed training

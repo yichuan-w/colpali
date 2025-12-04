@@ -1,4 +1,5 @@
 import argparse
+import os
 import shutil
 from pathlib import Path
 
@@ -6,6 +7,7 @@ import torch
 from datasets import load_dataset
 from peft import LoraConfig
 from transformers import TrainingArguments
+from transformers.utils.import_utils import is_flash_attn_2_available
 
 from colpali_engine.data.dataset import ColPaliEngineDataset
 from colpali_engine.loss.late_interaction_losses import ColbertLoss, ColbertPairwiseCELoss
@@ -23,6 +25,9 @@ def parse_args():
     p.add_argument("--trainer", type=str, default="hf", choices=["torch", "hf"], help="trainer to use")
     p.add_argument("--loss", type=str, default="ce", choices=["ce", "pairwise"], help="loss function to use")
     p.add_argument("--peft", action="store_true", help="use PEFT for training")
+    p.add_argument("--batch-size", type=int, default=64, help="per device train batch size (default: 64)")
+    p.add_argument("--eval-batch-size", type=int, default=16, help="per device eval batch size (default: 16)")
+    p.add_argument("--gradient-accumulation-steps", type=int, default=1, help="gradient accumulation steps (default: 1)")
     return p.parse_args()
 
 
@@ -43,6 +48,20 @@ if __name__ == "__main__":
     else:
         raise ValueError(f"Unknown loss function: {args.loss}")
 
+    # Check if flash attention is available
+    attn_implementation = "flash_attention_2" if is_flash_attn_2_available() else None
+    if attn_implementation:
+        print("✅ Using Flash Attention 2")
+    else:
+        print("⚠️  Flash Attention 2 not available, using default attention implementation")
+        print("   Install flash-attn for better performance: pip install flash-attn")
+
+    # Check if using local or remote dataset
+    use_local_dataset = os.environ.get("USE_LOCAL_DATASET", "1") == "1"
+    eval_dataset_path = "./data_dir/colpali_train_set" if use_local_dataset else "vidore/colpali_train_set"
+    if not use_local_dataset:
+        print("📥 Using remote dataset from HuggingFace Hub")
+
     config = ColModelTrainingConfig(
         output_dir=args.output_dir,
         processor=ColQwen2_5_Processor.from_pretrained(
@@ -53,11 +72,11 @@ if __name__ == "__main__":
             pretrained_model_name_or_path="./models/base_models/colqwen2.5-base",
             torch_dtype=torch.bfloat16,
             use_cache=False,
-            attn_implementation="flash_attention_2",
+            attn_implementation=attn_implementation,
         ),
         train_dataset=load_train_set(),
         eval_dataset=ColPaliEngineDataset(
-            load_dataset("./data_dir/colpali_train_set", split="test"), pos_target_column_name="image"
+            load_dataset(eval_dataset_path, split="test"), pos_target_column_name="image"
         ),
         run_eval=True,
         loss_func=loss_func,
@@ -65,10 +84,11 @@ if __name__ == "__main__":
             output_dir=None,
             overwrite_output_dir=True,
             num_train_epochs=5,
-            per_device_train_batch_size=64,
+            per_device_train_batch_size=args.batch_size,
+            gradient_accumulation_steps=args.gradient_accumulation_steps,
             gradient_checkpointing=True,
             gradient_checkpointing_kwargs={"use_reentrant": False},
-            per_device_eval_batch_size=16,
+            per_device_eval_batch_size=args.eval_batch_size,
             eval_strategy="steps",
             dataloader_num_workers=8,
             save_steps=500,
