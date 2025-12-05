@@ -35,6 +35,7 @@ USE_LOCAL_DATASET=0 python scripts/configs/qwen2/train_colqwen25_model.py \
 
 if we use multi GPU
 ```
+export WANDB_PROJECT="colqwen25-training"
 USE_LOCAL_DATASET=0 accelerate launch --multi-gpu scripts/configs/qwen2/train_colqwen25_model.py \
     --output-dir ./models/my_colqwen25_lora \
     --peft \

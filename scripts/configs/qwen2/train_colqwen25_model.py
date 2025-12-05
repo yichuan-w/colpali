@@ -29,6 +29,7 @@ def parse_args():
     p.add_argument("--eval-batch-size", type=int, default=16, help="per device eval batch size (default: 16)")
     p.add_argument("--gradient-accumulation-steps", type=int, default=1, help="gradient accumulation steps (default: 1)")
     p.add_argument("--num-epochs", type=int, default=5, help="number of training epochs (default: 5)")
+    p.add_argument("--dataloader-num-workers", type=int, default=8, help="number of dataloader worker processes (default: 8, use 0 for debug)")
     return p.parse_args()
 
 
@@ -91,13 +92,15 @@ if __name__ == "__main__":
             gradient_checkpointing_kwargs={"use_reentrant": False},
             per_device_eval_batch_size=args.eval_batch_size,
             eval_strategy="steps",
-            dataloader_num_workers=8,
+            dataloader_num_workers=args.dataloader_num_workers,
             save_steps=500,
             logging_steps=10,
             eval_steps=100,
             warmup_steps=100,
             learning_rate=args.lr,
             save_total_limit=1,
+            report_to="wandb",  # Enable wandb logging
+            run_name=f"colqwen25_lora_{args.output_dir.split('/')[-1]}",  # Optional: set run name
         ),
         peft_config=LoraConfig(
             r=32,
