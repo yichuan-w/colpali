@@ -28,6 +28,7 @@ def parse_args():
     p.add_argument("--batch-size", type=int, default=64, help="per device train batch size (default: 64)")
     p.add_argument("--eval-batch-size", type=int, default=16, help="per device eval batch size (default: 16)")
     p.add_argument("--gradient-accumulation-steps", type=int, default=1, help="gradient accumulation steps (default: 1)")
+    p.add_argument("--num-epochs", type=int, default=5, help="number of training epochs (default: 5)")
     return p.parse_args()
 
 
@@ -83,7 +84,7 @@ if __name__ == "__main__":
         tr_args=TrainingArguments(
             output_dir=None,
             overwrite_output_dir=True,
-            num_train_epochs=5,
+            num_train_epochs=args.num_epochs,
             per_device_train_batch_size=args.batch_size,
             gradient_accumulation_steps=args.gradient_accumulation_steps,
             gradient_checkpointing=True,

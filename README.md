@@ -39,5 +39,6 @@ USE_LOCAL_DATASET=0 accelerate launch --multi-gpu scripts/configs/qwen2/train_co
     --output-dir ./models/my_colqwen25_lora \
     --peft \
     --batch-size 8 \
-    --gradient-accumulation-steps 8
+    --gradient-accumulation-steps 8 \
+    --num-epochs 1
 ```
