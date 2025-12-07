@@ -30,6 +30,8 @@ def parse_args():
     p.add_argument("--gradient-accumulation-steps", type=int, default=1, help="gradient accumulation steps (default: 1)")
     p.add_argument("--num-epochs", type=int, default=5, help="number of training epochs (default: 5)")
     p.add_argument("--dataloader-num-workers", type=int, default=8, help="number of dataloader worker processes (default: 8, use 0 for debug)")
+    p.add_argument("--warmup-steps", type=int, default=None, help="number of warmup steps (default: 100, or 2.5%% of total steps if None)")
+    p.add_argument("--optimizer", type=str, default=None, help="optimizer to use (default: adamw, options: adamw, paged_adamw_8bit)")
     return p.parse_args()
 
 
@@ -96,8 +98,9 @@ if __name__ == "__main__":
             save_steps=500,
             logging_steps=10,
             eval_steps=100,
-            warmup_steps=100,
+            warmup_steps=args.warmup_steps if args.warmup_steps is not None else 100,
             learning_rate=args.lr,
+            optim=args.optimizer if args.optimizer else "adamw",
             save_total_limit=1,
             report_to="wandb",  # Enable wandb logging
             run_name=f"colqwen25_lora_{args.output_dir.split('/')[-1]}",  # Optional: set run name
