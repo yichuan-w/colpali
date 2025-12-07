@@ -100,6 +100,7 @@ if __name__ == "__main__":
             eval_steps=100,
             warmup_steps=args.warmup_steps if args.warmup_steps is not None else 100,
             learning_rate=args.lr,
+            lr_scheduler_type="linear",  # Linear decay as per document requirements
             optim=args.optimizer if args.optimizer else "adamw",
             save_total_limit=1,
             report_to="wandb",  # Enable wandb logging

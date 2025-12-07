@@ -84,3 +84,10 @@ Parameter explanations:
 
 If training for multiple epochs, warmup steps should be increased accordingly:
 - 5 epochs: `--warmup-steps 62` (2.5% of ~2489 steps)
+
+## How to eval
+use my self-written pipeline
+
+```
+python /fsx/ubuntu/yichuan-dev/colpali/LEANN/apps/multimodal/vision-based-pdf-multi-vector/vidore_v1_benchmark.py --model /fsx/ubuntu/yichuan-dev/colpali/models/colqwen25-training-e2e-Dec7  --tasks docvqa --use-fast 
+```
