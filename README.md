@@ -63,15 +63,13 @@ USE_LOCAL_DATASET=0 accelerate launch --multi-gpu scripts/configs/qwen2/train_co
 ```
 
 ```
-MODEL_NAME="colqwen25-training-aligned-5epoch"
+MODEL_NAME="colqwen25-training-aligned-5epoch-new"
 export WANDB_PROJECT="$MODEL_NAME"
 USE_LOCAL_DATASET=0 accelerate launch --multi-gpu scripts/configs/qwen2/train_colqwen25_model.py \
     --output-dir ./models/$MODEL_NAME \
     --peft \
-    --batch-size 32 \
+    --batch-size 64 \
     --lr 5e-5 \
-    --optimizer paged_adamw_8bit \
-    --warmup-steps 62 \
     --num-epochs 5
 ```
 

@@ -182,5 +182,5 @@ cython_debug/
 *.ipynb
 
 *.json
-
+*.png
 wandb/
