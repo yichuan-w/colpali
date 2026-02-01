@@ -4,7 +4,7 @@
 /.vscode/
 /data/
 /logs/
-/models/
+models
 /outputs/
 /results/
 /debug/
@@ -183,4 +183,5 @@ cython_debug/
 
 *.json
 *.png
+wandb/models/
 wandb/
